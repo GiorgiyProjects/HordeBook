@@ -1,0 +1,8 @@
+packages:
+
+1. express - server application framework
+2. mongoose - framework for conecting and using mongoDB
+3. dotenv - hide ensitive information into environment variables
+4. helmet - sefe requests to server
+5. morgan- logger that would output information about requests
+6. nodemon - allows to start server once and refresh the application on save of files
