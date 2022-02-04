@@ -1,0 +1,12 @@
+.homeContainer {
+    display: flex;
+    width:100%;
+    height: 100%;
+    background-color: #0e1422;
+}
+
+.BigContainer {
+    width:100%;
+    color: white;
+    min-height: 100%;
+}
