@@ -10,16 +10,18 @@ router.get("/", (req, res)=> {
 router.post("/", async(req, res) => {
     const newPost = new Post(req.body)
     try {
+        res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST)
         const savedPost = await newPost.save();
         res.status(200).json(savedPost);
     } catch(err) {
 
     }
-})
+});
 
 //update post
 router.put("/:id", async(req, res) => {
     try {
+        res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST)
         const post = await Post.findById(req.params.id);
         console.log(post.userId);
         console.log(req.body.userId);
@@ -33,11 +35,12 @@ router.put("/:id", async(req, res) => {
     } catch(err) {
         res.status(500).json(err);
     }
-})
+});
 
 // delete post
 router.delete("/:id", async(req, res) => {
     try {
+        res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST)
         const post = await Post.findById(req.params.id);
         console.log(post.userId);
         console.log(req.body.userId);
@@ -51,12 +54,13 @@ router.delete("/:id", async(req, res) => {
     } catch(err) {
         res.status(500).json(err);
     }
-})
+});
 
 
 // like a post
 router.put("/:id/like", async(req,res) => {
     try {
+        res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST)
         const post = await Post.findById(req.params.id);
         console.log(post);
         console.log(req.body.userId);
@@ -73,13 +77,14 @@ router.put("/:id/like", async(req,res) => {
     } catch(err) {
         res.status(500).json(err);
     }
-})
+});
 
 
 //get a post
 //get user
 router.get("/:id", async(req, res) => {
     try {
+        res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST)
         console.log("Try and get post by id");
         const post = await Post.findById(req.params.id);
         return res.status(200).json(post);
@@ -89,21 +94,36 @@ router.get("/:id", async(req, res) => {
 });
 
 //get timeline posts
-router.get("/timeline/all", async(req, res) => {
+router.get("/timeline/:userId", async(req, res) => {
     let postArray = [];
     try {
-        const currentUser = await User.findById(req.body.userId);
-        console.log(currentUser);
+        res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST)
+        const currentUser = await User.findById(req.params.userId);
         const userPosts = await Post.find({userId: currentUser._id.toString()});
-        console.log(userPosts);
         const friendPosts = await Promise.all(
             currentUser.following.map(friendId => {
                 console.log(friendId);
                 return Post.find({userId: friendId});
             }));
-        return res.status(200).json(userPosts.concat(...friendPosts));
+        console.log(userPosts.concat(...friendPosts));
+
+        res.status(200).json(userPosts.concat(...friendPosts));
     } catch(err) {
-        return res.status(500).json(err);
+        res.status(500).json(err);
+    }
+});
+
+//get all users posts
+router.get("/profile/:username", async(req, res) => {
+    let postArray = [];
+    try {
+        res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST);
+        const user = await User.findOne({username : req.params.username});
+        const posts = await Post.find({userId : user._id});
+        res.status(200).json(posts);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json(err);
     }
 });
 module.exports = router

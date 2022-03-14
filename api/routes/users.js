@@ -4,18 +4,15 @@ const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
 const User = require("../models/User");
 
-router.get("/", (req, res)=> {
-    res.send("hey users")
-});
-
 //update user
-router.put("/:id", async(req, res) => {
+router.put("/:id", async (req, res) => {
+    res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST)
     if (req.body.userId === req.params.id || req.body.isAdmin) {
         if (req.body.password) {
             try {
                 const salt = await bcrypt.genSalt(10);
                 req.body.password = await bcrypt.hash(req.body.password, salt);
-            } catch(err) {
+            } catch (err) {
                 return res.status(500).json("You can update only your account!");
             }
         }
@@ -25,7 +22,7 @@ router.put("/:id", async(req, res) => {
                 $set: req.body,
             });
             res.status(200).json("Account has been updated!");
-        } catch(err) {
+        } catch (err) {
             return res.status(500).json("Could not update your account");
         }
     } else {
@@ -34,13 +31,14 @@ router.put("/:id", async(req, res) => {
 });
 
 //delete user
-router.delete("/:id", async(req, res) => {
+router.delete("/:id", async (req, res) => {
+    res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST)
     if (req.body.userId === req.params.id || req.body.isAdmin) {
         try {
             console.log("updating info");
             const user = await User.findByIdAndDelete(req.params.id);
             res.status(200).json("Account has been deleted!");
-        } catch(err) {
+        } catch (err) {
             return res.status(500).json("Could not delete account");
         }
     } else {
@@ -48,27 +46,43 @@ router.delete("/:id", async(req, res) => {
     }
 });
 
+//get user
+/*router.get("/:id", async (req, res) => {
+    try {
+        res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST);
+        console.log("Try and get user");
+        const user = await User.findById(req.params.id);
+        console.log(user);
+        return res.status(200).json(user);
+    } catch (err) {
+        return res.status(500).json("Could not find account");
+    }
+});*/
 
 //get user
-router.get("/:id", async(req, res) => {
+router.get("/", async (req, res) => {
+    const userId = req.query.userId;
+    const userName = req.query.username;
+    
     try {
-        console.log("Try and get user");
-        const user = await User.findById(req.body.userId);
+        res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST);
+        const user = userId ? await User.findById(userId) : await User.findOne({username : userName});
         return res.status(200).json(user);
-    } catch(err) {
+    } catch (err) {
         return res.status(500).json("Could not find account");
     }
 });
 
 // follow user
-router.put("/:id/follow", async(req, res) => {
+router.put("/:id/follow", async (req, res) => {
+    res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST)
     if (req.body.userId !== req.params.id) {
         try {
             const user = await User.findById(req.params.id);
             const currentUser = await User.findById(req.body.userId);
             if (!user.followers.includes(req.body.userId)) {
-                await user.updateOne({$push: {followers: req.body.userId}});
-                await currentUser.updateOne({$push: {following: req.body.userId}});
+                await user.updateOne({ $push: { followers: req.body.userId } });
+                await currentUser.updateOne({ $push: { following: req.body.userId } });
                 return res.status(200).json("User has been followed");
             } else {
                 return res.status(403).json("You already follow that user");
@@ -79,7 +93,7 @@ router.put("/:id/follow", async(req, res) => {
     } else {
         res.status(403).json("You dont just follow yourself");
     }
-})
+});
 
 //unfollow user
 

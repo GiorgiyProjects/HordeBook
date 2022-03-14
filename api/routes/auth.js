@@ -5,8 +5,13 @@ const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json()
 const bcrypt = require("bcrypt");
 
+router.get("/", (req, res)=> {
+    res.send("hey auth")
+});
+
 //Register
 router.post("/register", jsonParser, async(req, res)=> {
+    res.set('Access-Control-Allow-Origin', process.env.CLIENT_HOST);
     console.log("Will try to register a new user");
     try
     {
@@ -30,16 +35,25 @@ router.post("/register", jsonParser, async(req, res)=> {
 
 // Login
 router.post("/login", async(req, res)=>{
+    console.log("Trying to login");
     try {
-        console.log("Trying to login");
-        console.log(req.body);
+        console.log("Trying to login2");
+        console.log("request data", req.body);
         const user = await User.findOne({email: req.body.email});
-        !user && res.status(404).json("User not found");
+        if (!user) {
+            console.log("USer not found");
+            res.status(404).json("User not found");
+            return;
+        }
 
-        console.log(user);
+        console.log("user", user);
 
-        const validPassword = await bcrypt.compare(req.body.password, user.password);
-        !validPassword && res.status(400).json("Wrong password");
+        //const validPassword = await bcrypt.compare(req.body.password, user.password);
+        const validPassword = await (req.body.password == user.password); // for debug only!
+        if (!validPassword)  {
+            res.status(400).json("Wrong password");
+            return;
+        }
 
         res.status(200).json(user);
     } catch(err) {

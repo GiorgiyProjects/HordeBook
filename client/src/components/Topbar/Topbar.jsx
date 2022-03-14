@@ -3,12 +3,15 @@ import Person from '@mui/icons-material/AccessibilityNew';
 import SearchIcon from '@mui/icons-material/Search';
 import ChatIcon from '@mui/icons-material/Chat';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import {Link} from "react-router-dom"
 
 export default function Topbar() {
     return (
         <div className="topbarContainer">
             <div className="topbarLeft">
-                <span className="topbarLogo">HordeBook</span>
+                <Link to = "/" style={{textDecoration:"none"}}>
+                    <span className="topbarLogo">HordeBook</span>
+                </Link>
             </div>
             <div className="topbarCenter">
                 <span className="searchBar">

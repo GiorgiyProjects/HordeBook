@@ -1,3 +1,8 @@
+*{
+    margin: 0;
+    font-family: 'Iceland', cursive;
+}
+
 .profileContainer {
     display: flex;
     width:100%;
@@ -48,7 +53,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-bottom: 20px;
 }
 
 .profileInfoName {

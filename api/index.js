@@ -11,7 +11,13 @@ const authRoute = require("./routes/auth")
 const postRoute = require("./routes/posts")
 
 const app = express();
-app.use(bodyParser());
+app.use(bodyParser.json());
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    console.log(req.body);
+    next();
+  });
 
 mongoose.connect(process.env.MONGO_URL, {useNewUrlParser: true},()=> {
     console.log("Connected to MongoDB")
